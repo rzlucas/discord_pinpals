@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Administración de servidores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            margin: 0;
+            text-align: center;
+        }
+
+        form {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        #results {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+        }
+
+        table {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1>Administración de servidores</h1>
+
+    <form id="add-server-form">
+        <h2>Agregar servidor</h2>
+        <input type="text" id="name" placeholder="Nombre del servidor">
+        <input type="number" id="ownerId" placeholder="ID del propietario">
+        <button type="submit">Agregar</button>
+    </form>
+
+    <form id="search-server-form">
+        <h2>Buscar servidor</h2>
+        <input type="number" id="searchById" placeholder="ID del servidor">
+        <input type="text" id="searchByName" placeholder="Nombre del servidor">
+        <button type="submit">Buscar</button>
+    </form>
+
+    <table id="server-table" style="display: none;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>OwnerID</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        document.getElementById('add-server-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const ownerId = document.getElementById('ownerId').value;
+
+            fetch("http://127.0.0.1:5000/servers/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        Name: name,
+                        OwnerID: ownerId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Servidor agregado con éxito");
+                    document.getElementById('name').value = '';
+                    document.getElementById('ownerId').value = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        document.getElementById('search-server-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const id = document.getElementById('searchById').value;
+            const name = document.getElementById('searchByName').value;
+            let url = "http://127.0.0.1:5000/servers/";
+
+            if (id) {
+                url += id;
+            } else if (name) {
+                url += "?name=" + name;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById('server-table');
+                    const tbody = table.getElementsByTagName('tbody')[0];
+                    tbody.innerHTML = ''; // Limpiamos cualquier dato anterior
+
+                    const servers = Array.isArray(data) ? data : [data];
+                    servers.forEach(server => {
+                        const row = tbody.insertRow();
+                        row.insertCell().innerText = server.ID;
+                        row.insertCell().innerText = server.Name;
+                        row.insertCell().innerText = server.OwnerID;
+                    });
+
+                    table.style.display = 'table'; // Mostramos la tabla
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    </script>
+</body>
+
+</html>

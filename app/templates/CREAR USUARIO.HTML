@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Crear usuario</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+
+    h1 {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 0;
+      margin: 0;
+      text-align: center;
+    }
+
+    form {
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <h1>Crear usuario</h1>
+  <form id="register-form">
+    <input type="text" id="username" placeholder="Nombre de usuario">
+    <input type="email" id="email" placeholder="Correo electrónico">
+    <input type="password" id="password" placeholder="Contraseña">
+    <input type="text" id="profilePicture" placeholder="URL de la foto de perfil">
+    <button type="submit">Crear</button>
+  </form>
+
+  <script>
+    document.getElementById('register-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      var username = document.getElementById('username').value;
+      var email = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
+      var profilePicture = document.getElementById('profilePicture').value;
+
+      fetch("http://127.0.0.1:5000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          Username: username,
+          Email: email,
+          Password: password,
+          ProfilePicture: profilePicture
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message === "User registered successfully") {
+            alert("Usuario creado con éxito");
+            window.location.href = "/login";
+          } else {
+            alert(data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    });
+  </script>
+</body>
+</html>

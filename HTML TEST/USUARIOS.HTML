@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Usuarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1, h2 {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            margin: 0;
+            text-align: center;
+        }
+
+        form {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        table {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Gestión de Usuarios</h1>
+
+    <!-- Agregar usuario -->
+    <h2>Agregar Usuarios</h2>
+    <form id="add-user-form">
+        <input type="text" id="username" placeholder="Nombre de usuario">
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <input type="password" id="password" placeholder="Contraseña">
+        <input type="text" id="profilePicture" placeholder="URL de la foto de perfil">
+        <button type="submit">Agregar</button>
+    </form>
+
+    <!-- Consultar usuario -->
+    <h2>Consultar Usuarios</h2>
+    <form id="query-user-form">
+        <input type="number" id="id" placeholder="ID de usuario">
+        <button type="submit">Consultar</button>
+    </form>
+
+    <table id="user-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>ProfilePicture</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        document.getElementById('add-user-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var username = document.getElementById('username').value;
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var profilePicture = document.getElementById('profilePicture').value;
+
+            fetch("http://127.0.0.1:5000/users/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    Username: username,
+                    Email: email,
+                    Password: password,
+                    ProfilePicture: profilePicture
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Usuario agregado con éxito");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('query-user-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var id = document.getElementById('id').value;
+
+            fetch("http://127.0.0.1:5000/users/" + id)
+            .then(response => response.json())
+            .then(data => {
+                var tbody = document.getElementById('user-table').getElementsByTagName('tbody')[0];
+                tbody.innerHTML = '';
+
+                var row = tbody.insertRow();
+                row.insertCell().innerText = data.ID;
+                row.insertCell().innerText = data.Username;
+                row.insertCell().innerText = data.Email;
+                row.insertCell().innerText = data.ProfilePicture;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Canales</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            margin: 0;
+            text-align: center;
+        }
+
+        form {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        table {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+        #searchResults {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background: #eaeaea;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Gestión de Canales</h1>
+
+    <!-- Consultar canal por ID -->
+    <form id="channel-form-id">
+        <input type="number" id="id" placeholder="ID del canal">
+        <button type="submit">Consultar por ID</button>
+    </form>
+
+    <!-- Agregar canal -->
+    <form id="channel-form">
+        <input type="text" id="name" placeholder="Nombre del canal">
+        <input type="number" id="serverId" placeholder="ID del servidor">
+        <button type="submit">Agregar canal</button>
+    </form>
+
+    <!-- Buscar canal por nombre o usuario -->
+    <form id="channel-form-search">
+        <input type="text" id="search" placeholder="Buscar por nombre o usuario">
+        <button type="submit">Buscar</button>
+    </form>
+
+    <div id="searchResults"></div>
+
+    <table id="channel-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>ServerID</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        document.getElementById('channel-form-id').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var id = document.getElementById('id').value;
+
+            fetch("http://127.0.0.1:5000/channels/" + id)
+                .then(response => response.json())
+                .then(data => {
+                    var tbody = document.getElementById('channel-table').getElementsByTagName('tbody')[0];
+                    tbody.innerHTML = '';
+
+                    var row = tbody.insertRow();
+                    row.insertCell().innerText = data.ID;
+                    row.insertCell().innerText = data.Name;
+                    row.insertCell().innerText = data.ServerID;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        document.getElementById('channel-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var name = document.getElementById('name').value;
+            var serverId = document.getElementById('serverId').value;
+
+            fetch("http://127.0.0.1:5000/channels/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    Name: name,
+                    ServerID: serverId
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Canal agregado con éxito");
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        document.getElementById('channel-form-search').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var searchTerm = document.getElementById('search').value;
+
+            fetch("http://127.0.0.1:5000/channels/search?term=" + searchTerm)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('searchResults').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Mensajes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1, h2 {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            margin: 0;
+            text-align: center;
+        }
+
+        form {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        #messageContent, #userDetails {
+            margin-top: 20px;
+            border: solid 1px #333;
+            padding: 10px;
+            width: 80%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Gestión de Mensajes</h1>
+
+    <!-- Agregar mensaje -->
+    <form id="add-message-form">
+        <h2>Agregar Mensaje</h2>
+        <input type="text" id="content" placeholder="Contenido del mensaje">
+        <input type="number" id="userId" placeholder="ID del usuario">
+        <input type="number" id="channelId" placeholder="ID del canal">
+        <button type="submit">Agregar</button>
+    </form>
+
+    <!-- Consultar mensaje por ID -->
+    <form id="query-message-form">
+        <h2>Consultar Mensaje</h2>
+        <input type="number" id="messageId" placeholder="ID del mensaje">
+        <button type="submit">Consultar</button>
+    </form>
+
+    <div id="messageContent"></div>
+
+    <!-- Consultar usuario y sus mensajes por ID -->
+    <form id="query-user-form">
+        <h2>Consultar Usuario</h2>
+        <input type="number" id="userIdQuery" placeholder="ID del usuario">
+        <button type="submit">Consultar</button>
+    </form>
+
+    <div id="userDetails"></div>
+
+    <script>
+        document.getElementById('add-message-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var content = document.getElementById('content').value;
+            var userId = document.getElementById('userId').value;
+            var channelId = document.getElementById('channelId').value;
+
+            fetch("http://127.0.0.1:5000/messages/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    Content: content,
+                    UserID: userId,
+                    ChannelID: channelId
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Mensaje agregado con éxito");
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        document.getElementById('query-message-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var messageId = document.getElementById('messageId').value;
+
+            fetch("http://127.0.0.1:5000/messages/" + messageId, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('messageContent').innerText = "Contenido del mensaje: " + data.Content;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        document.getElementById('query-user-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var userIdQuery = document.getElementById('userIdQuery').value;
+
+            fetch("http://127.0.0.1:5000/users/" + userIdQuery, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    var userDetailsDiv = document.getElementById('userDetails');
+                    userDetailsDiv.innerHTML = "Nombre del usuario: " + data.userName + "<br>";
+
+                    userDetailsDiv.innerHTML += "<h3>Mensajes enviados:</h3>";
+                    data.messages.forEach(msg => {
+                        userDetailsDiv.innerHTML += `
+                            <div>
+                                <strong>Contenido:</strong> ${msg.content} 
+                                <strong>Canal:</strong> ${msg.channelName} 
+                                <strong>Servidor:</strong> ${msg.serverName}
+                            </div>
+                        `;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+
+</body>
+
+</html>

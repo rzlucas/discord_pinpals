@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar sesión</title>
+  <style>
+    /* (El mismo CSS, sin cambios) */
+  </style>
+</head>
+<body>
+  <h1>Iniciar sesión</h1>
+  <form id="login-form">
+    <input type="text" id="username" placeholder="Nombre de usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button type="submit">Iniciar sesión</button>
+  </form>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
+
+      fetch("http://127.0.0.1:5000/auth/login", {  // Modificado el URL del endpoint
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          Username: username,
+          Password: password
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message === "Logged in successfully") {  // Modificado para verificar el mensaje
+            window.location.href = "/home";
+          } else {
+            alert(data.message);  // Modificado para mostrar el mensaje
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    });
+  </script>
+</body>
+</html>

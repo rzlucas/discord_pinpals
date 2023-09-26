@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+</head>
+<body>
+    <h2>Iniciar Sesión</h2>
+    <form id="loginForm">
+        <label for="username">Nombre de Usuario:</label>
+        <input type="text" id="username" required>
+        <br>
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" required>
+        <br>
+        <input type="submit" value="Iniciar Sesión">
+    </form>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function(event){
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            fetch('http://127.0.0.1:5000/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ Username: username, Password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    if (data.message === "Logged in successfully") {
+                        // Puedes redireccionar a la página principal o realizar otra acción.
+                        window.location.href = "http://127.0.0.1:5000/userdata"; // Redireccionar a la página principal
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

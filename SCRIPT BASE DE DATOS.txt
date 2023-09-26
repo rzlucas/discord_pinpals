@@ -1,0 +1,41 @@
+CREATE DATABASE discord;
+USE discord;
+
+CREATE TABLE Users (
+    ID INT PRIMARY KEY,
+    Username VARCHAR(100),
+    Email VARCHAR(100),
+    Password VARCHAR(100),
+    ProfilePicture BLOB
+);
+
+CREATE TABLE Servers (
+    ID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    OwnerID INT,
+    FOREIGN KEY (OwnerID) REFERENCES Users(ID)
+);
+
+CREATE TABLE ServerMembers (
+    UserID INT,
+    ServerID INT,
+    FOREIGN KEY (UserID) REFERENCES Users(ID),
+    FOREIGN KEY (ServerID) REFERENCES Servers(ID),
+    PRIMARY KEY (UserID, ServerID)
+);
+
+CREATE TABLE Channels (
+    ID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    ServerID INT,
+    FOREIGN KEY (ServerID) REFERENCES Servers(ID)
+);
+
+CREATE TABLE Messages (
+    ID INT PRIMARY KEY,
+    Content TEXT,
+    UserID INT,
+    ChannelID INT,
+    FOREIGN KEY (UserID) REFERENCES Users(ID),
+    FOREIGN KEY (ChannelID) REFERENCES Channels(ID)
+);

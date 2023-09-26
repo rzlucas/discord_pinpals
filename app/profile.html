@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+</head>
+<body>
+    <h1>Perfil de Usuario</h1>
+    <div id="userData"></div>
+
+    <script>
+        // Realizar una solicitud al backend para obtener los datos del usuario
+        fetch('http://127.0.0.1:5000/userdata', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Mostrar los datos del usuario en formato JSON
+            document.getElementById('userData').innerText = JSON.stringify(data, null, 2);
+        })
+        .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>
